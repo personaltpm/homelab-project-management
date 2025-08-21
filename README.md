@@ -42,30 +42,26 @@ Deploy a self-hosted home automation system using Proxmox as virtualization plat
 | Learning curve for Proxmox | High | Low | Allow extra time, identify Discord/Reddit communities |
 
 ## Decisions Log
-2025-07: Hardware Platform Selection
+**2025-07: Hardware Platform Selection**
+- **Decision:** Use Surface Book 2 laptop instead of Raspberry Pi for Home Assistant
+- **Rationale:** Community feedback indicates Pi has stability issues with HA; existing Surface Book 2 available at no cost
+- **Trade-offs:** Surface may have compatibility issues with Proxmox, but web GUI management makes peripheral issues acceptable
 
-Decision: Use Surface Book 2 laptop instead of Raspberry Pi for Home Assistant
-Rationale: Community feedback indicates Pi has stability issues with HA; existing Surface Book 2 available at no cost
-Trade-offs: Surface may have compatibility issues with Proxmox, but web GUI management makes peripheral issues acceptable
+**2025-07: Virtualization Platform - Proxmox VE**
+- **Decision:** Selected Proxmox as hypervisor
+- **Rationale:** Zero licensing cost, proven HA compatibility based on community deployments, allows future VM expansion
+- **Future scope:** Second VM planned for Reolink/Wyze camera display system
 
-2025-07: Virtualization Platform - Proxmox VE
+**2025-07: Network Architecture**
+- **Decision:** Start with WiFi, migrate to wired later
+- **Rationale:** Prove feasibility before purchasing USB network adapter
+- **Success criteria:** If stable on WiFi for 7 days, purchase dedicated ethernet adapter
 
-Decision: Selected Proxmox as hypervisor
-Rationale: Zero licensing cost, proven HA compatibility based on community deployments, allows future VM expansion
-Future scope: Second VM planned for Reolink/Wyze camera display system
-
-2025-07: Network Architecture
-
-Decision: Start with WiFi, migrate to wired later
-Rationale: Prove feasibility before purchasing USB network adapter
-Success criteria: If stable on WiFi for 7 days, purchase dedicated ethernet adapter
-
-2025-07: Windows 10 License Preservation Strategy
-
-Decision: Keep Windows 10 (not upgrade to 11), link to Microsoft account before Proxmox installation
-Rationale: Digital license ties to MS account, improves reactivation chances in VM; Win10 better for older camera software
-Risk: No guaranteed method for OEM license transfer to VM
-Approach: Document multiple extraction methods, include phone activation as fallback
+**2025-07: Windows 10 License Preservation Strategy**
+- **Decision:** Keep Windows 10 (not upgrade to 11), link to Microsoft account before Proxmox installation
+- **Rationale:** Digital license ties to MS account, improves reactivation chances in VM
+- **Risk:** No guaranteed method for OEM license transfer to VM
+- **Approach:** Document multiple extraction methods, include phone activation as fallback
 
 ## Hardware Requirements
 

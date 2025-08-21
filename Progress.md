@@ -1,0 +1,44 @@
+## Week 1 Progress Template
+
+**Dates:** [Start] - [End]
+**Status:** ✅ Complete
+**Status:** 🔄 In Progress
+**Status:** ⏳ Planned
+
+**Planned vs Actual:**
+
+| Task | Planned | Actual | Status |
+|------|---------|--------|--------|
+| Backup Surface Book 2 data | Day 1 | | ⏳ |
+| Windows license extraction | Day 1 | | |
+| Link MS account | Day 1 | | |
+| Document BIOS settings | Day 2 | | |
+| Create Proxmox USB installer | Day 2 | | |
+| Test Proxmox live boot | Day 3 | | |
+| Full Proxmox installation | Day 4 | | |
+| Configure network settings | Day 5 | | |
+
+**Issues Encountered:**
+
+| Issue | Solution | Time Lost |
+|-------|----------|-----------|
+| | | |
+
+**Key Learnings:**
+- Surface Book BIOS accessed via Volume Up + Power
+- Windows digital license successfully linked to MS account
+
+**Community Resources Used:**
+- [Links to helpful resources]
+
+**Next Week Focus:**
+- [ ] Configure Proxmox networking for HA VM
+- [ ] Create Home Assistant VM
+- [ ] Test Windows activation in VM
+
+**Time Invested:** [X hours]
+
+**Key Learnings:**
+- [Add learnings as you go]
+
+---

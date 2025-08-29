@@ -63,16 +63,6 @@ Deploy a self-hosted home automation system using Proxmox as virtualization plat
 - **Risk:** No guaranteed method for OEM license transfer to VM
 - **Approach:** Document multiple extraction methods, include phone activation as fallback
 
-## Hardware Requirements
-
-| Component | Current State | Future Need | Priority |
-|-----------|---------------|-------------|----------|
-| Z-Wave | ✅ USB dongle owned | - | Complete |
-| Zigbee | ❌ Not owned | USB dongle required | High - Week 3 |
-| Matter | ❌ Not owned | USB dongle (optional) | Low - Month 2 |
-| USB Expansion | ✅ Hub available | - | Complete |
-| Network | WiFi (built-in) | USB ethernet adapter | Medium - Week 2 |
-
 ## Pre-Installation Checklist
 
 ### Windows License Preservation

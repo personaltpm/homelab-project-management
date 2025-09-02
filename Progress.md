@@ -81,6 +81,7 @@
 
 **Session 4 Planning:**  
 Home Assistant VM creation with validated stable Proxmox foundation.
+
 ---
 
 ## Session 2: Network Configuration & Troubleshooting

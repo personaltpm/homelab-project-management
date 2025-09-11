@@ -1,5 +1,115 @@
 # Project Progress Log
 ---
+## Session 6: Backup Strategy Implementation & External Storage Integration
+**Status:** ✅ Complete (Proxmox backup), 🔄 In Progress (HA backup automation)  
+**Time Invested:** 2.5 hours (1 hour NFS setup + 20 min scheduling + 1 hour HA research/manual backup)  
+**Key Achievement:** Automated Proxmox backup to Synology NAS with retention policies
+
+### Proxmox Backup Implementation:
+**Configuration approach:** Derek Seaman tutorial for NFS setup, modified for GUI configuration
+- **Tutorial reference:** [Synology NFS for Proxmox Backup Server Datastore](https://www.derekseaman.com/2025/08/how-to-synology-nfs-for-proxmox-backup-server-datastore-2025.html)
+- **Adaptation:** Used Proxmox web interface instead of shell commands for storage configuration
+- **Target storage:** Synology DS218j with NFS v3 protocol
+
+### Synology NFS Configuration:
+- **Service enabled:** Control Panel → File Services → NFS
+- **Shared folder created:** `proxmox-bkup` with dedicated path `/volume1/proxmox-bkup`
+- **NFS permissions:** Proxmox host IP (192.168.50.X) with read/write access
+- **Security setting:** "No mapping" for proper root access from Proxmox
+- **Storage verification:** NFS mount test successful via Proxmox web interface
+
+### Proxmox Backup Automation:
+**Storage configuration:**
+- **ID:** synology-backup
+- **Storage type:** NFS
+- **Content type:** VZDump backup files
+- **Server:** 192.168.50.X (Synology IP)
+- **Export path:** `/volume1/proxmox-bkup`
+
+**Automated scheduling:**
+- **Frequency:** Weekly (Monday 2:00 AM)
+- **Target VMs:** All VMs (automatic inclusion of future VMs)
+- **Retention policy:** Time-based (5 daily, 4 weekly, 2 monthly, 1 yearly)
+- **Compression:** ZSTD for optimal size/speed balance
+
+### Backup Validation:
+**Manual backup test results:**
+- **VM size:** 32.0 GiB (Home Assistant VM)
+- **Compressed archive:** 1.46 GB final size
+- **Transfer speed:** 1.1 GiB/s sustained throughput
+- **Duration:** Completed in under 30 minutes
+- **Status:** Successful with no errors
+- **Storage verification:** Backup file confirmed present on Synology NAS
+
+### Home Assistant Backup Strategy:
+**Manual backup capability:** Successfully created and downloaded HA backup files
+- **Backup scope:** Full system backup including configuration, add-ons, and data
+- **File size:** Compact compared to full VM backup
+- **Manual process:** Settings → System → Backups → Create backup
+
+**Automated backup implementation:** Network storage configuration attempted
+- **Target:** Same Synology NAS with dedicated HA shared folder
+- **Protocol:** SMB/CIFS for HA network storage
+- **Challenge:** SMB mount connectivity issues encountered
+- **Status:** Manual backups working, automation troubleshooting deferred to Session 7
+
+### Network Storage Architecture:
+| Component | Protocol | Path | Status | Purpose |
+|-----------|----------|------|--------|---------|
+| Proxmox backup | NFS | `/volume1/proxmox-bkup` | Functional | VM disaster recovery |
+| HA manual backup | Download | Local export | Functional | Configuration portability |
+| HA auto backup | SMB (planned) | `/volume1/ha-bkups` | In progress | Automated HA backup |
+
+### Key Technical Decisions:
+**NFS vs SMB protocol selection:**
+- **Proxmox:** NFS chosen for better Linux integration and performance
+- **Home Assistant:** SMB attempted for broader compatibility with HA add-ons
+- **Dual protocol approach:** Leverages optimal protocols for each system
+
+**Retention strategy rationale:**
+- **Time-based over count-based:** Provides recovery options across different time horizons
+- **Granular retention:** Recent backups dense, historical backups sparse
+- **Setup phase approach:** Intentionally inclusive retention during active development to preserve restore points
+- **Future optimization:** Retention policies will be refined once system stabilizes and usage patterns are established
+- **Storage efficiency:** Current settings balance protection with Synology capacity during learning phase
+
+### Backup Redundancy Strategy:
+**External storage approach validated:**
+- **Primary backup:** Proxmox VM backups to Synology NAS
+- **Secondary redundancy:** Synology cloud sync provides off-site protection
+- **Tertiary option:** Manual HA exports for critical configuration preservation
+- **Single point of failure eliminated:** Backup storage independent of host hardware
+
+### Session Outcomes:
+**Infrastructure backup complete:**
+- Automated weekly VM backups functional
+- External storage integration successful
+- Retention policies prevent storage bloat
+- Disaster recovery capability validated through test restore
+
+**Home Assistant backup foundation:**
+- Manual backup process confirmed working
+- Network storage architecture planned
+- SMB connectivity troubleshooting identified for next session
+
+### Next Session Focus:
+- [ ] Resolve SMB connectivity for automated HA backups
+- [ ] Test HA backup restoration process
+- [ ] Configure one direct HomeKit integration (Ecobee)
+- [ ] Begin automation migration from existing platforms
+- [ ] Document complete backup strategy for community sharing
+
+### Resources and Credits:
+- **Tutorial:** [Derek Seaman - Synology NFS for Proxmox](https://www.derekseaman.com/2025/08/how-to-synology-nfs-for-proxmox-backup-server-datastore-2025.html)
+- **Synology DSM:** NFS service configuration and shared folder management
+- **Proxmox VE:** Built-in backup scheduling and retention management
+
+---
+
+**Session 7 Planning:**  
+Complete HA backup automation and begin advanced device integration with focus on direct HomeKit connections.
+
+---
 
 ## Session 5: Device Integration & Network Architecture Implementation
 **Status:** ✅ Complete  

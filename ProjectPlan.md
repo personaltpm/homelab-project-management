@@ -1,6 +1,8 @@
 # homelab-project-management
 
-📊 **[View Progress Log](PROGRESS.md)** | 🚧 **Status:** Week 1 In Progress
+~~📊 **[View Progress Log](PROGRESS.md)** | 🚧 **Status:** Week 1 In Progress~~
+
+📋 **Project Planning Document** | Created prior to execution, see [current project documentation](README.md) for actual progress
 
 ## Project Scope
 Deploy a self-hosted home automation system using Proxmox as virtualization platform, running Home Assistant to manage smart home devices, with focus on security, reliability, and scalability for future additions. Secondary VM planned for Reolink/Wyze camera display system.
@@ -142,6 +144,4 @@ slmgr /rearm
 # Restart then retry activation
 ```
 
-## Lessons Learned
-[To be updated throughout project]
 

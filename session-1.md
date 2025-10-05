@@ -54,3 +54,6 @@
 - **Ethernet:** Standard virtual networking through Proxmox bridge
 - **USB passthrough:** Only needed for Z-Wave dongle (Zooz), not ethernet
 - **Future devices:** Zigbee/Matter dongles will require passthrough research
+  
+**Session 2 Planning:**
+Focus on network connectivity and basic Proxmox configuration once ethernet adapter arrives.

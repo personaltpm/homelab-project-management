@@ -4,11 +4,11 @@ Personal home automation infrastructure built on Proxmox VE + Home Assistant, do
 
 ## Project Overview
 
-**Planning Documentation:** [Original Project Plan](PROJECT-PLAN.md) (timeline and risk assessment prior to execution)
 **Hardware:** Surface Book 2 (8 CPU/16GB RAM) running Proxmox VE  
 **Core System:** Home Assistant OS VM (2 CPU, 6GB RAM, 32GB disk)  
 **Current State:** 148+ entities, hybrid SmartThings/direct integration architecture  
-**Goal:** Centralized home automation with local control priority, gradual cloud service migration
+**Goal:** Centralized home automation with local control priority, gradual cloud service migration  
+**Planning Documentation:** [Original Project Plan](project-plan.md) (timeline and risk assessment prior to execution)
 
 ## Documentation Structure
 
@@ -18,39 +18,39 @@ Sessions are documented chronologically with realistic timelines, decision ratio
 
 ## Infrastructure Foundation (Sessions 1-6)
 
-### [Session 1: Planning & Research](Session-1.md)
+### [Session 1: Planning & Research](session-1.md)
 Strategic approach, hardware selection rationale, success criteria definition
 
-### [Session 2: Proxmox Installation - Failed Attempt](Session-2.md)
+### [Session 2: Proxmox Installation - Failed Attempt](session-2.md)
 WiFi installation impossible, USB ethernet requirement discovered, 3+ hours troubleshooting
 
-### [Session 3: Clean Proxmox Installation](Session-3.md)
+### [Session 3: Clean Proxmox Installation](session-3.md)
 Fresh start with ethernet from boot, 1.5h successful deployment, interface stability validated
 
-### [Session 4: Home Assistant VM Deployment](Session-4.md)
+### [Session 4: Home Assistant VM Deployment](session-4.md)
 Community script deployment, hybrid integration strategy decision, initial device discovery
 
-### [Session 5: Device Integration & Network Challenges](Session-5.md)
+### [Session 5: Device Integration & Network Challenges](session-5.md)
 IoT isolation vs automation tradeoff, direct integrations expanded, ZWave USB passthrough validated
 
-### [Session 6: Backup Strategy Implementation](Session-6.md)
+### [Session 6: Backup Strategy Implementation](session-6.md)
 Proxmox → Synology NFS automated, HA → Samba Backup addon, SMB mount issues troubleshot
 
 ---
 
 ## System Organization & Expansion (Sessions 7-8)
 
-### [Session 7: Direct Integration Expansion + Entity Management](Session-7.md)
+### [Session 7: Direct Integration Expansion + Entity Management](session-7.md)
 Additional HomeKit/cloud integrations, entity rename marathon, caching issues discovery
 
-### [Session 8: System Organization + Dashboard Architecture](Session-8.md)
+### [Session 8: System Organization + Dashboard Architecture](session-8.md)
 Dashboard strategy validated, SmartThings entity limitations discovered, system maintenance events
 
 ---
 
 ## Monitoring & Device Migration (Sessions 9+)
 
-### [Session 9: Monitoring & Notifications + ZWave Test]
+### Session 9: Monitoring & Notifications + ZWave Test
 *In Progress*
 
 ---

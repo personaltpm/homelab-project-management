@@ -304,27 +304,29 @@ Body:
 
 ### Automation Recreation
 
-**Automation:** "Outside Lights On"
-- Trigger: Sunrise with offset
-- Target: Both migrated switches + 2 TPLink Kasa switches
-- Created in HA (previously ran in SmartThings app as workaround for reliability issues)
+**Background:** "Outside Lights On" automation previously failed via SmartThings bridge (Tenant Side Door Light consistently dropped commands). Automation disabled in HA, ran from ST app as workaround.
+
+**Post-migration approach:**
+- Re-enabled automation in HA
+- Removed all SmartThings bridge devices from automation
+- Automation now uses only direct control: 2 ZWave switches + 2 TPLink Kasa switches (WiFi direct)
 
 **Validation test:** Morning sunrise automation
-- ✅ Both ZWave switches responded
-- ✅ All devices turned on (no command drops)
+- ✅ All 4 devices responded
+- ✅ No command drops
 - ✅ Automation completed successfully
 
-**Comparison to SmartThings bridge behavior:**
-- Previous: 5 devices attempted, 4 succeeded, Tenant Side Door consistently failed
-- Direct ZWave: 4 devices attempted, 4 succeeded (includes 2 ZWave + 2 via TPLink integration)
+**Comparison:**
+- Previous (ST bridge): 5 devices attempted, 4 succeeded, Tenant Side Door consistently failed
+- Current (direct control only): 4 devices attempted, 4 succeeded (2 ZWave + 2 TPLink)
 
-**Conclusion:** Direct ZWave control eliminates timing-dependent failures observed with SmartThings cloud bridge
+**Conclusion:** Direct control (ZWave + WiFi) eliminates SmartThings cloud bridge timing failures. Full migration of remaining 33+ ST bridge switches validated as worthwhile.
 
 ---
 
 ## Honeywell T5 Integration Resolution
 
-**Background:** OAuth approval pending since S8 (submitted expected approval within 2 weeks, still no response over month)
+**Background:** OAuth approval pending since S8 (submitted 3+ weeks prior, expected approval within 2 weeks, still no response after months)
 
 **Alternative approach discovered:** HomeKit integration
 
@@ -397,10 +399,30 @@ Body:
 
 ---
 
+## Outstanding Items (Session 9)
+
+**NAS Drive 2 Replacement:**
+- RAID 0 with failing drive (crashes weekly)
+- 6TB replacement drive purchased
+- S10 plan: Test iDrive restore speed, assess feasibility
+- Decision criteria: If restore acceptable time → proceed with replacement. If too slow → assess risk of proceeding vs waiting vs pivot to alternative backup strategy
+
+**Node-RED Deeper Exploration:**
+- Deferred to S12 if complex notification logic requires it
+- Current: HA native automation sufficient for simple notifications
+
+**Full ZWave Migration:**
+- S11: Remaining 33+ switches (physical work, sparse documentation acceptable)
+
+**Comprehensive HA Notification Strategy:**
+- S12: System health thresholds, device offline detection, backup status monitoring, dynamic messages with entity values
+
+---
+
 ## Key Learnings
 
 **Technical:**
-- Supergroup migration not handled automatically in telegram config (UI integration detected issue and clearly indicated chat ID changes)
+- Supergroup migration not handled automatically in Telegram config (UI integration detected issue and clearly indicated chat ID changes vs YAML generic errors)
 - HA addons manage ZWave network, cannot update stick firmware (manufacturer tools required)
 - ZWave stick firmware update process is manufacturer-specific (Zooz → Simplicity Studio, other brands use different tools)
 - USB passthrough by Device ID more stable than port-based (survives physical port changes)

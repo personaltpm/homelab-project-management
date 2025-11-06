@@ -6,7 +6,7 @@
 
 **Hardware:** Proxmox Virtual Environment on Surface Book 2 (8CPU/16GB RAM) running Home Assistant OS VM, Synology DS218j NAS for backups
 
-**Current State:** Operational baseline with external access, 150+ entities integrated (ZWave/Zigbee via SmartThings cloud bridge + direct integrations), Google Assistant voice control, notification infrastructure across three systems (NAS/Proxmox/HA), comprehensive backup strategy (local NAS + offsite iDrive)
+**Current State:** Operational baseline with external access, 150+ entities integrated (ZWave direct + Zigbee via SmartThings cloud bridge + direct integrations), Google Assistant voice control, notification infrastructure across three systems (NAS/Proxmox/HA), comprehensive backup strategy (local NAS + offsite iDrive)
 
 **Goal:** Fully local smart home automation with direct device control, eliminating cloud dependencies where possible, maintaining reliability and expanding automation capabilities beyond SmartThings limitations
 
@@ -63,8 +63,8 @@ NAS hardware replaced (6TB SHR), 3TB data restored via iDrive, Nabu Casa operati
 
 ### Migration Phase (S11+)
 
-### Session 11: Full ZWave Migration
-**In Progress: 33+ switches ST→HA direct, voice automation Script expansion, entity replacement workflow*
+### [Session 11: ZWave Migration & Automation Architecture](session-11.md)
+29 devices migrated to direct HA control with label-based automation architecture, mesh stabilization troubleshooting completed, retry logic implemented for reliability
 
 ### Session 12: Notification Implementation
 *Planned: Comprehensive HA notification strategy, integration monitoring, device offline alerts*
@@ -77,17 +77,18 @@ NAS hardware replaced (6TB SHR), 3TB data restored via iDrive, Nabu Casa operati
 ### Compute & Network
 - **Proxmox Host:** 192.168.50.X, Surface Book 2 (8CPU/16GB RAM), sleep disabled, USB passthrough via Device ID
 - **Home Assistant VM:** 192.168.50.X, 2CPU/6GB RAM/32GB disk, HAOS 16.2, DHCP reserved, externally accessible via Nabu Casa
-- **Synology NAS:** 192.168.50.X, DS218j, 6TB single drive (SHR), NFS+Samba-Backup active, iDrive daily offsite backup, Drive 1 (4TB healthy) available for future redundancy
+- **Synology NAS:** 192.168.50.X, DS218j, 6TB single drive (SHR), NFS+Samba-Backup active, iDrive daily offsite backup
 - **Router:** ASUS ZenWiFi (5 years old), IoT isolation disabled, Monday 3AM reboot schedule
 - **External Access:** Nabu Casa cloud relay (active, validated)
 
 ### Integration Paths
-- **ZWave:** 2 direct HA (Tenant Side Porch, Side Light) + 31 ST cloud bridge (pending S11 migration)
-- **Zigbee:** ~10 devices via ST cloud bridge
-- **WiFi Direct:** Kasa switches/plugs (local control), Wyze (HACS integration + Docker for cameras)
-- **HomeKit Local:** 3 Ecobee thermostats, August lock, Mysa thermostat, Honeywell T5 (limited entity exposure)
+- **ZWave:** 29 direct HA (25 switches + 4 scene controllers) + 9 tenant devices ST cloud bridge (deferred)
+- **Zigbee:** 9 devices via ST cloud bridge (testing manual delay mitigation)
+- **WiFi Direct:** Kasa switches/plugs (local control), August lock, Wyze (HACS integration + Docker for cameras, motion control mitigated via switch-triggered Wyze app automation)
+- **HomeKit Local:** 3 Ecobee thermostats, Mysa thermostat, Honeywell T5 (limited entity exposure)
 - **Cloud Direct:** LG ThinQ (washer/dryer), Fitbit, Google Calendar
-- **Voice Control:** Google Assistant via Nabu Casa (2 devices exposed, 3 Scripts operational: bedtime/sleep/morning)
+- **Voice Control:** Google Assistant via Nabu Casa (29 ZWave devices + 16+ Scripts operational for automation routines), individual device voice control and manual app control functional, HA mobile app alternative (S13 dashboards)
+- **Automation Architecture:** Label-based Scripts with template filtering for complex logic (area + label combinations, exclusions), survives device migrations
 - **Notifications:** Telegram (NAS + Proxmox + HA), test automations validated
 
 ### Backup Strategy
@@ -112,6 +113,7 @@ NAS hardware replaced (6TB SHR), 3TB data restored via iDrive, Nabu Casa operati
 **Platform & Architecture:**
 - **Nabu Casa over DIY:** $65/year justified by security confidence + time savings vs DuckDNS/Let's Encrypt complexity, funds HA development, 31-day trial validated
 - **Scripts for voice automation:** HA logic + Google voice interface separation enables maintainability during device migrations (HA shows unavailable entities vs Google auto-deletes), supports parameters (brightness_pct), allows complex conditions
+- **Scripts + labels for migration-survival:** HA Scripts with device-based labels decouple automation logic from device pairing, Google Home automations call Scripts (unchanged during migration), labels applied to new devices automatically include in automations, unavailable entities visible (vs Google auto-delete when devices unpaired)
 - **SHR over Basic/RAID:** Single-drive start with future redundancy addition capability without data migration, learned from RAID-0 zero-redundancy risk
 - **iDrive offsite over local-only:** RAID-0 failure taught importance of offsite backup, 3TB restore validated in 4 days
 
@@ -121,34 +123,35 @@ NAS hardware replaced (6TB SHR), 3TB data restored via iDrive, Nabu Casa operati
 
 ## Critical Issues & Workarounds
 
-**SmartThings Cloud Bridge Reliability:**
-- **Issue:** Rapid-sequence commands drop consistently (5-device automation = 4 success, 1 failure, no error reported)
-- **Root cause:** ST cloud bridge timing failures, network latency + command queuing
-- **Impact:** "Outside Lights On" automation unreliable via ST
-- **Resolution (S9):** Migrated 2 switches to direct ZWave, automation now 100% reliable (4/4 devices respond)
-- **S11 plan:** Full migration of 33+ switches eliminates ST bridge dependency
-
 **SmartThings Entity Exposure Limitations:**
 - **Issue:** ST bridge exposes only basic on/off, hides advanced capabilities (dimmer levels, manufacturer metadata, firmware info, advanced config)
 - **Impact:** Severely limits automation possibilities (no brightness checking, no conditional logic on dimmer state)
-- **Resolution:** Direct ZWave integration provides full entity exposure + OTA firmware capability
+- **Resolution (S11):** 29 devices migrated to direct ZWave control, full entity exposure + OTA firmware capability, ST bridge eliminated for primary devices
 
 **Google Home State Sync:**
 - **Issue:** Manual control in app requires double-tap (first tap: light responds but Google UI reverts, second tap: syncs correctly)
 - **Pattern:** Voice commands work perfectly, HA→Google sync works, only Google app manual control affected
 - **Root cause:** State reporting race condition during initial pairing (Google expects immediate confirmation, Z-Wave mesh + HA response delayed)
-- **Status:** Monitoring for self-resolution (typically stabilizes within 24-48 hours as cache establishes), voice control primary use case
-
-**Wyze Motion Toggle Persistence:**
-- **Issue:** HA sets motion detection off → Wyze app loads on → HA reverts setting
-- **Possible causes:** Cloud API polling conflict, rate limiting, auth scope restrictions
-- **Status:** Monitoring, motion detection functional for automations despite toggle state inconsistency
+- **Status:** Persistent beyond week-plus observation, not cache issue, accepted as limitation, voice commands work reliably (primary use case), HA mobile app control alternative (S13 dashboards)
 
 **Honeywell T5 Limited Entity Exposure:**
 - **Issue:** HomeKit integration exposes temp/on-off/sensor only, no hold/schedule/advanced controls
 - **Background:** OAuth developer approval pending months, no response
 - **Resolution:** HomeKit via thermostat reset menu, acceptable for light use case
 - **Future:** Replace thermostat if limitations become problematic (not current priority)
+
+**ZWave Device Intermittent Unavailability:**
+- **Issue:** Devices randomly show as "dead" in HA ZWave JS, frequency unclear, affected devices appear random
+- **Recovery:** Ping device (often successful), re-interview, or delete/re-add (requires physical reset)
+- **Root cause unclear:** Multiple hypotheses (mesh routing, RF interference from USB 3.0, stick hardware limitations, manual routing conflicts, electrical noise)
+- **Mitigation:** Manual routing configured for problem devices (system currently stable), USB extender ordered to test RF interference hypothesis
+- **S12 plan:** Monitoring strategy to identify patterns, correlation analysis (manually-routed vs auto-routed devices, time of day, automation activity)
+
+**ZWave JS Driver Intermittent Crashes:**
+- **Issue:** Random device failures during automation execution with driver crash (`TypeError: resp.toSupervisionResult is not a function`), retry immediately succeeds
+- **Impact:** Makes time-triggered automations unreliable when running unattended
+- **Mitigation (S11):** Retry logic implemented (automation runs twice with 2-second delay between attempts), applied to all time/device-triggered automations
+- **Status:** Pragmatic solution providing reliability, root cause analysis deferred
 
 ## Key Lessons
 
@@ -171,6 +174,13 @@ NAS hardware replaced (6TB SHR), 3TB data restored via iDrive, Nabu Casa operati
 - SHR with single drive = future-proof for redundancy addition without data migration (vs Basic requiring backup/restore for RAID conversion)
 - Scripts vs Scenes: Scripts provide parameter control (brightness_pct explicit values) and logic capability vs static state snapshots requiring re-save on changes
 - Typos in webhook URLs (botAPI- vs bot) cause silent failures, test messages critical for validation after config changes
+- Scripts + labels survive device migrations (Google automations unchanged throughout 29-device migration, HA Scripts show unavailable entities vs Google auto-delete, automation layer stable while device layer changes)
+- ZWave pairing unpredictability exceeds physical work time (expected unscrewing bottleneck, reality: exclusion/inclusion software unpredictability with no diagnostic feedback)
+- Mesh stabilization non-obvious requirement (5-day troubleshooting period post-migration, auto-optimization insufficient, manual routing intervention necessary)
+- USB-based ZWave stick limitations at scale (no external antenna, proximity to laptop required, USB 3.0 RF interference concerns, no 800-series support)
+- Retry logic pragmatic solution (2-second overhead vs extended root cause troubleshooting for intermittent driver crashes)
+- Template architecture enables complex automation logic (device-based labels with Jinja2 templates for area + label filtering, exclusions, AND logic not possible in UI)
+- QR code photography forward-thinking prep (photographing S2 devices during initial pairing avoids unscrewing faceplates for dead node re-addition)
 
 **Project Management:**
 - Session-flex framework: work-based not time-based post-infrastructure phase (S1-6 had dedicated blocks, S7+ incremental across days)
@@ -218,38 +228,35 @@ NAS hardware replaced (6TB SHR), 3TB data restored via iDrive, Nabu Casa operati
 
 ## Project Status
 
-**Current Phase:** Configuration baseline complete, external access operational, voice automation architecture validated
+**Current Phase:** Core migration complete, monitoring and optimization phase beginning
 
-**Completed (S1-10):**
+**Completed (S1-11):**
 - Proxmox installation with stable networking (ethernet)
 - Home Assistant VM deployment and base configuration
 - Backup infrastructure (Proxmox NFS + HA Samba + iDrive offsite, all validated)
 - Device integration: 150+ entities (WiFi direct, HomeKit local, ST cloud bridge, cloud services)
 - Dashboard POC: functional approach validated
 - Notification infrastructure: Telegram across three systems (NAS/Proxmox/HA)
-- ZWave test migration: 2 switches direct, automation reliability validated
+- ZWave migration: 29 devices direct HA control (25 switches + 4 scene controllers), mesh stabilized after troubleshooting
 - NAS hardware replacement: 6TB SHR, 3TB restored via iDrive
 - External access: Nabu Casa operational, Google Assistant integrated
-- Voice automation: Scripts architecture validated (3 operational)
-
-**In Progress:**
-- Google Home state sync monitoring (expected self-resolution)
-- Voice automation expansion planning (S11: Scripts for ZWave devices)
+- Voice automation: Scripts architecture validated, 16+ Scripts operational, 29 ZWave devices exposed for individual control
+- Automation architecture: Label-based Scripts with template filtering, migration-survival validated
+- Reliability improvements: Retry logic implemented for unattended automation reliability
 
 **Next Major Milestones:**
-- **S11:** Full ZWave migration (33+ switches ST→HA direct), voice automation Script expansion, entity replacement workflow
-- **S12:** Comprehensive HA notification strategy (integration monitoring, device offline alerts, automation failures, system health)
+- **S12:** Comprehensive HA notification strategy (integration monitoring, device offline alerts, automation failures, system health, ZWave stability tracking, USB extender evaluation)
 - **S13:** Dashboard completion (status dashboard, functional dashboard expansion)
 - **Post-S13:** Operational baseline reached, future sessions driven by scope expansion or learning value
 
 **Open Issues:**
-- Full ZWave migration: S11 (33+ switches from ST bridge to direct HA control)
-- Voice automation Script creation: S11 (automations using ZWave devices, create with ST entities, replace post-migration)
 - HA notification implementation: S12 (comprehensive monitoring strategy)
+- ZWave device availability monitoring: S12 (identify failure patterns, correlation analysis)
+- USB extender evaluation: S12 (test RF interference mitigation)
 - Dashboard expansion: S13 (status dashboard, additional functional dashboards)
-- Wyze motion toggle persistence (monitor, not blocking)
+- Tenant ZWave devices: 9 switches deferred (migrate when convenient)
+- Zigbee migration evaluation: test manual delays, decide coordinator purchase
 - Honeywell T5 limited entity exposure (monitor adequacy, replace thermostat if limitations problematic)
-- NAS redundancy: Add Drive 1 (4TB) post-S11 for SHR fault tolerance (deferred until after high-risk migration work)
 
 **Critical Success Factors Validated:**
 - Backup strategy comprehensive and tested (local + offsite, restore capability proven)
@@ -260,6 +267,6 @@ NAS hardware replaced (6TB SHR), 3TB data restored via iDrive, Nabu Casa operati
 
 ---
 
-**STATUS:** S1-10-complete | External-access-operational (Nabu Casa) | Google-Assistant-integrated | Voice-automation-POC-validated | NAS-6TB-SHR-stable | 3TB-restored-iDrive-active | Ready-S11: full-ZWave-migration (33+ switches)
+**STATUS:** S1-11-complete | 29-ZWave-direct | Label-automation-architecture | Retry-logic-operational | Manual-routing-stable | Ready-S12: monitoring-strategy
 
-**Last Updated:** Session 10 completion, incremental configuration phase with external access and voice automation foundation established
+**Last Updated:** Session 11 completion, ZWave migration complete with automation architecture established, system operational after mesh stabilization

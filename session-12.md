@@ -67,8 +67,6 @@ Monitoring coverage implemented: 9 automations operational across device health 
 
 **Decision:** Implemented both real-time and daily automations based on metric characteristics, not blanket approach.
 
----
-
 **Notification hierarchy implementation:**
 - Created two Telegram groups: standard notifications (muted) and Critical Alerts (sound enabled)
 - Standard: Daily summaries, low battery alerts, offline device lists

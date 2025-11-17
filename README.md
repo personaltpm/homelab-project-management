@@ -1,4 +1,4 @@
-# Home Assistant Home Lab Project
+# Home Assis# Home Assistant Home Lab Project
 
 ## Project Overview
 
@@ -6,7 +6,7 @@
 
 **Hardware:** Proxmox Virtual Environment on Surface Book 2 (8CPU/16GB RAM) running Home Assistant OS VM, Synology DS218j NAS for backups
 
-**Current State:** Operational baseline with external access, 150+ entities integrated (ZWave direct + Zigbee via SmartThings cloud bridge + direct integrations), Google Assistant voice control, notification infrastructure across three systems (NAS/Proxmox/HA), comprehensive backup strategy (local NAS + offsite iDrive)
+**Current State:** Operational baseline with external access, 150+ entities integrated (ZWave direct + Zigbee via SmartThings cloud bridge + direct integrations), Google Assistant voice control, comprehensive monitoring infrastructure operational (device health, system resources, automation errors, backups), notification system across all layers (NAS/Proxmox/HA), backup strategy validated (local NAS + offsite iDrive)
 
 **Goal:** Fully local smart home automation with direct device control, eliminating cloud dependencies where possible, maintaining reliability and expanding automation capabilities beyond SmartThings limitations
 
@@ -21,7 +21,7 @@ This repository documents the complete build process through sequential session 
 Sessions are grouped by project phase:
 - **Infrastructure (S1-6):** Base system installation, networking, backup configuration
 - **Configuration (S7-10):** Device integration, entity management, external access, voice automation
-- **Migration (S11+):** Direct ZWave control, comprehensive automation implementation
+- **Migration (S11-12):** Direct ZWave control, comprehensive automation implementation, monitoring infrastructure
 
 The documentation prioritizes teaching value - detailed troubleshooting when solutions were non-obvious, compressed coverage when processes worked as expected. See individual session files for complete technical narratives.
 
@@ -61,16 +61,16 @@ Telegram notification infrastructure operational (NAS/Proxmox/HA), ZWave firmwar
 ### [Session 10: External Access & Voice Automation Foundation](session-10.md)
 NAS hardware replaced (6TB SHR), 3TB data restored via iDrive, Nabu Casa operational with Google Assistant integrated, voice automation architecture established via Scripts POC
 
-### Migration Phase (S11+)
+### Migration Phase (S11-12)
 
 ### [Session 11: ZWave Migration & Automation Architecture](session-11.md)
 29 devices migrated to direct HA control with label-based automation architecture, mesh stabilization troubleshooting completed, retry logic implemented for reliability
 
-### Session 12: Notification Implementation
-*Planned: Comprehensive HA notification strategy, integration monitoring, device offline alerts*
+### [Session 12: Comprehensive Monitoring Infrastructure](session-12.md)
+Operational monitoring system with real-time and daily notifications covering device health, system resources, automation errors, and backups via Telegram with two-tier notification hierarchy
 
-### Session 13: Dashboard Completion
-*Planned: Status dashboard, functional dashboard expansion*
+### Session 13: Dashboard Implementation
+*Planned: Comprehensive system monitoring, area, user, and action based dashboards*
 
 ## Current Architecture
 
@@ -89,7 +89,8 @@ NAS hardware replaced (6TB SHR), 3TB data restored via iDrive, Nabu Casa operati
 - **Cloud Direct:** LG ThinQ (washer/dryer), Fitbit, Google Calendar
 - **Voice Control:** Google Assistant via Nabu Casa (29 ZWave devices + 16+ Scripts operational for automation routines), individual device voice control and manual app control functional, HA mobile app alternative (S13 dashboards)
 - **Automation Architecture:** Label-based Scripts with template filtering for complex logic (area + label combinations, exclusions), survives device migrations
-- **Notifications:** Telegram (NAS + Proxmox + HA), test automations validated
+- **Notifications:** Telegram (two groups: muted for daily summaries, Critical Alerts with sound for immediate failures), 9 monitoring automations operational covering device health, system resources, automation errors, backup failures
+- **Monitoring Coverage:** 9 automations (4 device health, 2 system health, 3 infrastructure), real-time critical alerts + daily summaries, historical troubleshooting sensors enabled
 
 ### Backup Strategy
 - **Proxmox:** Monday 2AM via NFS to Synology (retention: 5 daily/4 weekly/2 monthly/1 yearly)
@@ -116,6 +117,12 @@ NAS hardware replaced (6TB SHR), 3TB data restored via iDrive, Nabu Casa operati
 - **Scripts + labels for migration-survival:** HA Scripts with device-based labels decouple automation logic from device pairing, Google Home automations call Scripts (unchanged during migration), labels applied to new devices automatically include in automations, unavailable entities visible (vs Google auto-delete when devices unpaired)
 - **SHR over Basic/RAID:** Single-drive start with future redundancy addition capability without data migration, learned from RAID-0 zero-redundancy risk
 - **iDrive offsite over local-only:** RAID-0 failure taught importance of offsite backup, 3TB restore validated in 4 days
+
+**Monitoring Strategy:**
+- **Custom automations over blueprints:** Blueprint limitations (inflexible exclusions, empty message bugs, no logic modification) required custom automations for complex monitoring logic, accepted verbosity for maintainability
+- **Real-time vs daily split:** Match notification frequency to metric timescale (disk/device offline immediate, battery/system load daily summaries), reduces notification fatigue while maintaining coverage
+- **System Monitor vs Glances:** Protection Mode security prioritized, System Monitor sufficient for alerting metrics, Glances enabled temporarily when root cause analysis needed
+- **Two-tier notification hierarchy:** Muted group for daily summaries/planning items, Critical Alerts with sound for actionable immediate failures, prevents notification fatigue
 
 **Backup Architecture:**
 - **Samba Backup addon over SMB mount:** Addon pushes TO NAS (safe), mount IN HA caused crashes during router reboots (S6 discovery)
@@ -144,8 +151,8 @@ NAS hardware replaced (6TB SHR), 3TB data restored via iDrive, Nabu Casa operati
 - **Issue:** Devices randomly show as "dead" in HA ZWave JS, frequency unclear, affected devices appear random
 - **Recovery:** Ping device (often successful), re-interview, or delete/re-add (requires physical reset)
 - **Root cause unclear:** Multiple hypotheses (mesh routing, RF interference from USB 3.0, stick hardware limitations, manual routing conflicts, electrical noise)
-- **Mitigation:** Manual routing configured for problem devices (system currently stable), USB extender ordered to test RF interference hypothesis
-- **S12 plan:** Monitoring strategy to identify patterns, correlation analysis (manually-routed vs auto-routed devices, time of day, automation activity)
+- **Mitigation:** Manual routing configured for problem devices, USB extender mitigated RF interference issues
+- **Status (S12):** Mesh routing more stable after USB extender implementation, monitoring continues
 
 **ZWave JS Driver Intermittent Crashes:**
 - **Issue:** Random device failures during automation execution with driver crash (`TypeError: resp.toSupervisionResult is not a function`), retry immediately succeeds
@@ -178,9 +185,14 @@ NAS hardware replaced (6TB SHR), 3TB data restored via iDrive, Nabu Casa operati
 - ZWave pairing unpredictability exceeds physical work time (expected unscrewing bottleneck, reality: exclusion/inclusion software unpredictability with no diagnostic feedback)
 - Mesh stabilization non-obvious requirement (5-day troubleshooting period post-migration, auto-optimization insufficient, manual routing intervention necessary)
 - USB-based ZWave stick limitations at scale (no external antenna, proximity to laptop required, USB 3.0 RF interference concerns, no 800-series support)
+- USB extender mitigates USB 3.0 RF interference (physical distance from laptop ports resolved intermittent ZWave device unavailability that manual routing couldn't fix)
 - Retry logic pragmatic solution (2-second overhead vs extended root cause troubleshooting for intermittent driver crashes)
 - Template architecture enables complex automation logic (device-based labels with Jinja2 templates for area + label filtering, exclusions, AND logic not possible in UI)
 - QR code photography forward-thinking prep (photographing S2 devices during initial pairing avoids unscrewing faceplates for dead node re-addition)
+- Blueprint limitations emerge with complexity (simple use cases work, complex exclusion/conditional logic better served by custom automations)
+- Real-time vs daily monitoring matches metric timescale (critical/fast-changing immediate, trends/slow-changing daily summaries reduces fatigue)
+- Historical sensor data enables root cause analysis (troubleshooting sensors before problems show what changed when alerts trigger)
+- Two-tier notification hierarchy prevents alert fatigue (muted for informational, sound for critical maintains effectiveness)
 
 **Project Management:**
 - Session-flex framework: work-based not time-based post-infrastructure phase (S1-6 had dedicated blocks, S7+ incremental across days)
@@ -228,9 +240,9 @@ NAS hardware replaced (6TB SHR), 3TB data restored via iDrive, Nabu Casa operati
 
 ## Project Status
 
-**Current Phase:** Core migration complete, monitoring and optimization phase beginning
+**Current Phase:** Core migration and monitoring complete, dashboard development phase beginning
 
-**Completed (S1-11):**
+**Completed (S1-12):**
 - Proxmox installation with stable networking (ethernet)
 - Home Assistant VM deployment and base configuration
 - Backup infrastructure (Proxmox NFS + HA Samba + iDrive offsite, all validated)
@@ -242,18 +254,15 @@ NAS hardware replaced (6TB SHR), 3TB data restored via iDrive, Nabu Casa operati
 - External access: Nabu Casa operational, Google Assistant integrated
 - Voice automation: Scripts architecture validated, 16+ Scripts operational, 29 ZWave devices exposed for individual control
 - Automation architecture: Label-based Scripts with template filtering, migration-survival validated
-- Reliability improvements: Retry logic implemented for unattended automation reliability
+- Reliability improvements: Retry logic implemented, USB extender resolved RF interference, mesh routing stabilized
+- Monitoring infrastructure: 9 automations operational, two-tier Telegram notification hierarchy, real-time critical alerts + daily summaries
 
 **Next Major Milestones:**
-- **S12:** Comprehensive HA notification strategy (integration monitoring, device offline alerts, automation failures, system health, ZWave stability tracking, USB extender evaluation)
-- **S13:** Dashboard completion (status dashboard, functional dashboard expansion)
+- **S13:** Comprehensive system monitoring, area, user, and action based dashboards
 - **Post-S13:** Operational baseline reached, future sessions driven by scope expansion or learning value
 
 **Open Issues:**
-- HA notification implementation: S12 (comprehensive monitoring strategy)
-- ZWave device availability monitoring: S12 (identify failure patterns, correlation analysis)
-- USB extender evaluation: S12 (test RF interference mitigation)
-- Dashboard expansion: S13 (status dashboard, additional functional dashboards)
+- Dashboard expansion: S13 (comprehensive system monitoring, area, user, action based dashboards)
 - Tenant ZWave devices: 9 switches deferred (migrate when convenient)
 - Zigbee migration evaluation: test manual delays, decide coordinator purchase
 - Honeywell T5 limited entity exposure (monitor adequacy, replace thermostat if limitations problematic)
@@ -264,9 +273,10 @@ NAS hardware replaced (6TB SHR), 3TB data restored via iDrive, Nabu Casa operati
 - Direct control benefits proven (ZWave reliability + entity exposure vs ST limitations)
 - Voice automation architecture maintainable (Scripts survive device migrations, Google automations unchanged)
 - Hardware isolation prevents cascade failures (NAS issues don't destabilize HA/Proxmox)
+- Monitoring infrastructure operational (device health, system resources, automation errors, backups all covered)
 
 ---
 
-**STATUS:** S1-11-complete | 29-ZWave-direct | Label-automation-architecture | Retry-logic-operational | Manual-routing-stable | Ready-S12: monitoring-strategy
+**STATUS:** S1-12-complete | Monitoring-operational | 29-ZWave-direct | Label-automation-architecture | USB-extender-resolved | Ready-S13: dashboard-implementation
 
-**Last Updated:** Session 11 completion, ZWave migration complete with automation architecture established, system operational after mesh stabilization
+**Last Updated:** Session 12 completion, comprehensive monitoring infrastructure operational with two-tier notification hierarchy

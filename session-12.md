@@ -135,6 +135,19 @@ Monitoring coverage implemented: 9 automations operational across device health 
 
 ---
 
+## ZWAVE MESH STABILITY RESOLUTION
+
+**Outstanding issue from S11:** Intermittent device unavailability, multiple hypotheses (mesh routing, RF interference, stick hardware, electrical noise)
+
+**USB extender testing (S12):**
+- Hypothesis: USB 3.0 RF interference from laptop port affecting ZWave stick operation
+- Solution: USB extender providing physical distance from USB 3.0 ports
+- Result: Mesh routing stabilized, intermittent unavailability significantly reduced
+
+**Monitoring approach:** Continue tracking device availability patterns via S12 monitoring infrastructure to validate sustained improvement and identify any remaining edge cases.
+
+---
+
 ## KEY LEARNINGS
 
 **Blueprint limitations emerge with complexity:** Simple use cases work well. Complex logic (custom exclusions, conditional notifications) better served by custom automations despite more verbose YAML. Control and maintainability outweigh brevity.

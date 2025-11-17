@@ -147,6 +147,8 @@ Monitoring coverage implemented: 9 automations operational across device health 
 
 **Mode: single prevents duplicate notifications:** Essential for device-level alerts when multiple entities per device exist (cameras with power/motion/notification switches). First entity triggers, subsequent ignored until completion.
 
+**USB extender resolved RF interference:** USB 3.0 RF interference from laptop port to ZWave stick caused intermittent device unavailability. USB extender (physical distance from USB 3.0 ports) resolved mesh stability issues that manual routing couldn't fully address.
+
 ---
 
 ## OUTSTANDING ITEMS

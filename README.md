@@ -1,4 +1,4 @@
-# Home Assis# Home Assistant Home Lab Project
+# Home Assistant Home Lab Project
 
 ## Project Overview
 
